@@ -24,3 +24,4 @@ Route::get('/reservations', [ReservationController::class, 'index']);
 Route::post('/reservations', [ReservationController::class, 'store']);
 Route::get('/reservations/{reservation:id}', [ReservationController::class, 'show']);
 Route::delete('/reservations/delete/{reservation:id}', [ReservationController::class, 'destroy']);
+Route::put('/reservations/update', [ReservationController::class, 'update']);

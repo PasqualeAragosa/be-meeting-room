@@ -118,9 +118,28 @@ class ReservationController extends Controller
      * @param  \App\Models\Reservation  $reservation
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateReservationRequest $request, Reservation $reservation)
+    public function update(Request $request)
     {
-        //
+        $reservation = Reservation::find($request->id);
+        $reservation->name = $request->name;
+        $reservation->surname = $request->surname;
+        $reservation->date = $request->date;
+        $reservation->timeFrom = $request->timeFrom;
+        $reservation->timeTo = $request->timeTo;
+        $reservation->notes = $request->notes;
+        $result = $reservation->save();
+
+        if ($result) {
+            return response()->json([
+                'success' => true,
+                'results' => 'Reservation has been changed'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'results' => 'PUT operation is failed'
+            ]);
+        }
     }
 
     /**
