@@ -55,9 +55,9 @@ class ReservationController extends Controller
             [
                 'name' => 'required',
                 'surname' => 'required',
-                'date' => 'required|date|date_format:d-m-Y',
+                'date' => 'required|date|date_format:d/m/Y',
                 'timeFrom' => 'required',
-                'timeTo' => 'required',
+                'timeTo' => 'required|after:timeFrom',
                 'notes' => 'required',
             ]
         );
@@ -138,9 +138,9 @@ class ReservationController extends Controller
             [
                 'name' => 'required',
                 'surname' => 'required',
-                'date' => 'required|date|date_format:d-m-Y',
+                'date' => 'required|date|date_format:d/m/Y',
                 'timeFrom' => 'required',
-                'timeTo' => 'required',
+                'timeTo' => 'required|after:timeFrom',
                 'notes' => 'required',
             ]
         );
