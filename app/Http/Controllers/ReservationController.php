@@ -55,7 +55,7 @@ class ReservationController extends Controller
             [
                 'name' => 'required',
                 'surname' => 'required',
-                'date' => 'required',
+                'date' => 'required|date|date_format:d-m-Y',
                 'timeFrom' => 'required',
                 'timeTo' => 'required',
                 'notes' => 'required',
@@ -130,6 +130,28 @@ class ReservationController extends Controller
      */
     public function update(Request $request)
     {
+
+        $data = $request->all();
+
+        $validator = Validator::make(
+            $data,
+            [
+                'name' => 'required',
+                'surname' => 'required',
+                'date' => 'required|date|date_format:d-m-Y',
+                'timeFrom' => 'required',
+                'timeTo' => 'required',
+                'notes' => 'required',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+            ]);
+        }
+
         $reservation = Reservation::find($request->id);
         $reservation->name = $request->name;
         $reservation->surname = $request->surname;
