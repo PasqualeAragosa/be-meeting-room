@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateReservationRequest;
 use Illuminate\Http\Request;
 use App\Models\Reservation;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Carbon;
 
 class ReservationController extends Controller
 {
@@ -17,9 +18,15 @@ class ReservationController extends Controller
      */
     public function index()
     {
+        $reservations = Reservation::all();
+
+        foreach ($reservations as $reservation) {
+            $reservation->date = Carbon::createFromFormat('Y-m-d', $reservation->date)->format('d-m-Y');
+        }
+
         return response()->json([
             'success' => true,
-            'results' => Reservation::all(),
+            'results' => $reservations,
         ]);
     }
 
@@ -87,10 +94,13 @@ class ReservationController extends Controller
     {
         $reservation = Reservation::where('id', $id)->first();
 
+        // Change date format using Carbon
+        $reservation->date = Carbon::createFromFormat('Y-m-d', $reservation->date)->format('d-m-Y');
+
         if ($id) {
             return response()->json([
                 'success' => true,
-                'results' => $reservation
+                'results' => $reservation,
             ]);
         } else {
             return response()->json([
