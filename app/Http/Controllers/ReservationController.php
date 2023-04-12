@@ -195,4 +195,17 @@ class ReservationController extends Controller
             return response()->json(null);
         }
     }
+
+    public function search($string)
+    {
+
+        $result = Reservation::where("notes", "like", "%" . $string . "%")->get();
+
+        if ($result) {
+            return response()->json([
+                'success' => true,
+                'results' => $result
+            ]);
+        }
+    }
 }

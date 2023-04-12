@@ -9,10 +9,4 @@
     -   PUT change and update reservation
     -   DELETE reservation
 
--   Validazione dei campi richiesta
-
-    -   Controllo su orario ecc ecc
-
--   Aggiungere 'Note' all'output
-
--   Momentaneamente senza autenticazione
+-   Aggiungi autenticazione
