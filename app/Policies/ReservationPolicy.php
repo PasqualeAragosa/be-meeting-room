@@ -25,10 +25,10 @@ class ReservationPolicy
      * Determine whether the user can view the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Reservations  $reservations
+     * @param  \App\Models\Reservation  $reservation
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function view(User $user, Reservation $reservations)
+    public function view(User $user, Reservation $reservation)
     {
         //
     }
@@ -48,10 +48,10 @@ class ReservationPolicy
      * Determine whether the user can update the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Reservations  $reservations
+     * @param  \App\Models\Reservation  $reservation
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(User $user, Reservation $reservations)
+    public function update(User $user, Reservation $reservation)
     {
         //
     }
@@ -60,10 +60,10 @@ class ReservationPolicy
      * Determine whether the user can delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Reservations  $reservations
+     * @param  \App\Models\Reservation  $reservation
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function delete(User $user, Reservation $reservations)
+    public function delete(User $user, Reservation $reservation)
     {
         //
     }
@@ -72,10 +72,10 @@ class ReservationPolicy
      * Determine whether the user can restore the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Reservations  $reservations
+     * @param  \App\Models\Reservation  $reservation
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function restore(User $user, Reservation $reservations)
+    public function restore(User $user, Reservation $reservation)
     {
         //
     }
@@ -84,10 +84,10 @@ class ReservationPolicy
      * Determine whether the user can permanently delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Reservations  $reservations
+     * @param  \App\Models\Reservation  $reservation
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function forceDelete(User $user, Reservation $reservations)
+    public function forceDelete(User $user, Reservation $reservation)
     {
         //
     }
