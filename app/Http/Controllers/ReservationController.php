@@ -18,11 +18,7 @@ class ReservationController extends Controller
      */
     public function index()
     {
-        $reservations = Reservation::all();
-
-        foreach ($reservations as $reservation) {
-            $reservation->date = Carbon::createFromFormat('Y-m-d', $reservation->date)->format('d-m-Y');
-        }
+        $reservations = Reservation::paginate(10);
 
         return response()->json([
             'success' => true,
