@@ -20,7 +20,7 @@ class ReservationSeeder extends Seeder
             $reservation = new Reservation();
             $reservation->name = $faker->name();
             $reservation->surname = $faker->lastName();
-            $reservation->date = $faker->date();
+            $reservation->date = $faker->date('d-m-Y');
             $reservation->timeFrom = $faker->time();
             $reservation->timeTo = $faker->time();
             $reservation->notes = $faker->text(100);

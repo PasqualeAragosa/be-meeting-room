@@ -21,7 +21,7 @@ class ReservationController extends Controller
         $reservations = Reservation::all();
 
         foreach ($reservations as $reservation) {
-            $reservation->date = Carbon::createFromFormat('Y/m/d', $reservation->date)->format('d/m/Y');
+            $reservation->date = Carbon::createFromFormat('Y-m-d', $reservation->date)->format('d-m-Y');
         }
 
         return response()->json([
@@ -55,7 +55,7 @@ class ReservationController extends Controller
             [
                 'name' => 'required',
                 'surname' => 'required',
-                'date' => 'required|date|date_format:d/m/Y',
+                'date' => 'required|date|date_format:d-m-Y',
                 'timeFrom' => 'required',
                 'timeTo' => 'required|after:timeFrom',
                 'notes' => 'required',
@@ -95,7 +95,7 @@ class ReservationController extends Controller
         $reservation = Reservation::where('id', $id)->first();
 
         // Change date format using Carbon
-        $reservation->date = Carbon::createFromFormat('Y/m/d', $reservation->date)->format('d/m/Y');
+        $reservation->date = Carbon::createFromFormat('Y-m-d', $reservation->date)->format('d-m-Y');
 
         if ($id) {
             return response()->json([
@@ -138,7 +138,7 @@ class ReservationController extends Controller
             [
                 'name' => 'required',
                 'surname' => 'required',
-                'date' => 'required|date|date_format:d/m/Y',
+                'date' => 'required|date|date_format:d-m-Y',
                 'timeFrom' => 'required',
                 'timeTo' => 'required|after:timeFrom',
                 'notes' => 'required',
