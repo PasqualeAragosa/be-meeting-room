@@ -4,6 +4,7 @@ use App\Http\Controllers\ReservationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\Reservation;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,3 +27,14 @@ Route::get('/reservations/{reservation:id}', [ReservationController::class, 'sho
 Route::delete('/reservations/delete/{reservation:id}', [ReservationController::class, 'destroy']);
 Route::put('/reservations/update', [ReservationController::class, 'update']);
 Route::get('/reservations/search/{string}', [ReservationController::class, 'search']);
+
+Route::group([
+
+    'middleware' => 'api',
+    'prefix' => 'auth'
+
+], function ($router) {
+
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+});
