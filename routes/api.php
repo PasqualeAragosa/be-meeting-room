@@ -3,7 +3,6 @@
 use App\Http\Controllers\ReservationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Models\Reservation;
 use App\Http\Controllers\AuthController;
 
 /*
@@ -22,10 +21,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/reservations', [ReservationController::class, 'index']);
-Route::post('/reservations', [ReservationController::class, 'store']);
-Route::get('/reservations/{reservation:id}', [ReservationController::class, 'show']);
-Route::delete('/reservations/delete/{reservation:id}', [ReservationController::class, 'destroy']);
-Route::put('/reservations/update', [ReservationController::class, 'update']);
+Route::post('/reservation', [ReservationController::class, 'store']);
+Route::get('/reservation/{reservation:id}', [ReservationController::class, 'show']);
+Route::delete('/reservation/delete/{reservation:id}', [ReservationController::class, 'destroy']);
+Route::put('/reservation/update', [ReservationController::class, 'update']);
 Route::get('/reservations/search/{string}', [ReservationController::class, 'search']);
 
 Route::group([

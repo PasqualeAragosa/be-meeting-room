@@ -21,8 +21,8 @@ class ReservationSeeder extends Seeder
             $reservation->name = $faker->name();
             $reservation->surname = $faker->lastName();
             $reservation->date = $faker->date('d-m-Y');
-            $reservation->timeFrom = $faker->time();
-            $reservation->timeTo = $faker->time();
+            $reservation->timeFrom = $faker->time('H:i');
+            $reservation->timeTo = $faker->time('H:i');
             $reservation->notes = $faker->text(100);
             $reservation->save();
         }

@@ -90,10 +90,7 @@ class ReservationController extends Controller
     {
         $reservation = Reservation::where('id', $id)->first();
 
-        // Change date format using Carbon
-        $reservation->date = Carbon::createFromFormat('Y-m-d', $reservation->date)->format('d-m-Y');
-
-        if ($id) {
+        if ($id && $reservation) {
             return response()->json([
                 'success' => true,
                 'results' => $reservation,
@@ -102,7 +99,7 @@ class ReservationController extends Controller
             return response()->json([
                 'success' => false,
                 'results' => 'Reservation not found'
-            ]);
+            ], 404);
         }
     }
 
@@ -162,11 +159,6 @@ class ReservationController extends Controller
                 'success' => true,
                 'results' => 'Reservation has been changed'
             ]);
-        } else {
-            return response()->json([
-                'success' => false,
-                'results' => 'PUT operation is failed'
-            ]);
         }
     }
 
@@ -180,15 +172,16 @@ class ReservationController extends Controller
     {
         $reservation = Reservation::find($id);
 
-        $result = $reservation->delete();
-
-        if ($result) {
+        if ($id && $reservation) {
             return response()->json([
-                'success' => true,
-                'results' => "Reservation " . $id . " has been deleted"
+                'success' => $reservation->delete(),
+                'message' => "Reservation " . $id . " has been deleted",
             ]);
         } else {
-            return response()->json(null);
+            return response()->json([
+                'success' => false,
+                'message' => "Reservation id: " . $id . " not found",
+            ]);
         }
     }
 
