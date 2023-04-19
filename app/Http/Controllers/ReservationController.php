@@ -32,13 +32,25 @@ class ReservationController extends Controller
                 'date' => $reservation->date,
                 'timeFrom' => $reservation->timeFrom,
                 'timeTo' => $reservation->timeTo,
-                'note' => $reservation->note
+                'note' => $reservation->note,
             ];
         }
 
+        $reservations = [
+            'current_page' => $reservations->currentPage(),
+            'data' => $results,
+            'last_page' => $reservations->lastPage(),
+            'per_page' => $reservations->perPage(),
+            'total' => $reservations->total(),
+            'next_page_url' => $reservations->nextPageUrl(),
+            'prev_page_url' => $reservations->previousPageUrl(),
+            'from' => $reservations->firstItem(),
+            'to' => $reservations->lastItem()
+        ];
+
         return response()->json([
             'success' => true,
-            'results' => $results
+            'results' => $reservations
         ]);
     }
 
