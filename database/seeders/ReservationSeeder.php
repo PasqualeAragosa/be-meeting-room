@@ -19,12 +19,12 @@ class ReservationSeeder extends Seeder
         for ($i = 0; $i < 5; $i++) {
             $reservation = new Reservation();
             $reservation->name = $faker->name();
-            $reservation->user_id = 2;
+            $reservation->user_id = 1;
             $reservation->surname = $faker->lastName();
             $reservation->date = $faker->date('d-m-Y');
             $reservation->timeFrom = $faker->time('H:i');
             $reservation->timeTo = $faker->time('H:i');
-            $reservation->notes = $faker->text(100);
+            $reservation->note = $faker->text(100);
             $reservation->save();
         }
     }

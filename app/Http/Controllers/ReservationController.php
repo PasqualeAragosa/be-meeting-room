@@ -21,9 +21,24 @@ class ReservationController extends Controller
     {
         $reservations = Reservation::orderByDesc('id')->where('user_id', Auth::id())->paginate(10);
 
+        foreach ($reservations as $reservation) {
+            $results[] = [
+                'id' => $reservation->id,
+                'user_id' => $reservation->user_id,
+                'user' => [
+                    'name' => $reservation->name,
+                    'surname' => $reservation->surname
+                ],
+                'date' => $reservation->date,
+                'timeFrom' => $reservation->timeFrom,
+                'timeTo' => $reservation->timeTo,
+                'note' => $reservation->note
+            ];
+        }
+
         return response()->json([
             'success' => true,
-            'results' => $reservations,
+            'results' => $results
         ]);
     }
 
@@ -55,7 +70,7 @@ class ReservationController extends Controller
                 'date' => 'required|date|date_format:d-m-Y',
                 'timeFrom' => 'required',
                 'timeTo' => 'required|after:timeFrom',
-                'notes' => 'required',
+                'note' => 'required',
             ]
         );
 
@@ -73,12 +88,23 @@ class ReservationController extends Controller
         $reservation->date = $data['date'];
         $reservation->timeFrom = $data['timeFrom'];
         $reservation->timeTo = $data['timeTo'];
-        $reservation->notes = $data['notes'];
+        $reservation->note = $data['note'];
         $reservation->save();
 
         return response()->json([
             "success" => true,
-            "data" => $reservation
+            'results' => [
+                'id' => $reservation->id,
+                'user_id' => $reservation->user_id,
+                'user' => [
+                    'name' => $reservation->name,
+                    'surname' => $reservation->surname,
+                ],
+                'date' => $reservation->date,
+                'timeFrom' => $reservation->timeFrom,
+                'timeTo' => $reservation->timeTo,
+                'note' => $reservation->note,
+            ]
         ]);
     }
 
@@ -94,7 +120,18 @@ class ReservationController extends Controller
         if (Auth::id() === $reservation->user_id && $reservation) {
             return response()->json([
                 'success' => true,
-                'results' => $reservation,
+                'results' => [
+                    'id' => $reservation->id,
+                    'user_id' => $reservation->user_id,
+                    'user' => [
+                        'name' => $reservation->name,
+                        'surname' => $reservation->surname,
+                    ],
+                    'date' => $reservation->date,
+                    'timeFrom' => $reservation->timeFrom,
+                    'timeTo' => $reservation->timeTo,
+                    'note' => $reservation->note,
+                ]
             ]);
         } else {
             return response()->json([
@@ -135,7 +172,7 @@ class ReservationController extends Controller
                 'date' => 'required|date|date_format:d-m-Y',
                 'timeFrom' => 'required',
                 'timeTo' => 'required|after:timeFrom',
-                'notes' => 'required',
+                'note' => 'required',
             ]
         );
 
@@ -152,13 +189,18 @@ class ReservationController extends Controller
         $reservation->date = $request->date;
         $reservation->timeFrom = $request->timeFrom;
         $reservation->timeTo = $request->timeTo;
-        $reservation->notes = $request->notes;
+        $reservation->note = $request->note;
         $result = $reservation->save();
 
         if ($result && Auth::id() === $reservation->user_id) {
             return response()->json([
                 'success' => true,
-                'results' => 'Reservation has been changed'
+                'results' => 'Reservation has been changed',
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'results' => 'Reservation not founded'
             ]);
         }
     }
@@ -189,12 +231,27 @@ class ReservationController extends Controller
     public function search($string)
     {
 
-        $result = Reservation::where("notes", "like", "%" . $string . "%")->get();
+        $reservations = Reservation::where("note", "like", "%" . $string . "%")->where('user_id', Auth::id())->get();
 
-        if ($result) {
+        foreach ($reservations as $reservation) {
+            $results[] = [
+                'id' => $reservation->id,
+                'user_id' => $reservation->user_id,
+                'user' => [
+                    'name' => $reservation->name,
+                    'surname' => $reservation->surname
+                ],
+                'date' => $reservation->date,
+                'timeFrom' => $reservation->timeFrom,
+                'timeTo' => $reservation->timeTo,
+                'note' => $reservation->note
+            ];
+        }
+
+        if ($results) {
             return response()->json([
                 'success' => true,
-                'results' => $result
+                'results' => $results
             ]);
         }
     }

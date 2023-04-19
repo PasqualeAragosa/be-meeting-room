@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('date');
             $table->string('timeFrom');
             $table->string('timeTo');
-            $table->text('notes');
+            $table->text('note');
             $table->timestamps();
         });
     }
