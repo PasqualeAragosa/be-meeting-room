@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Reservation;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class ReservationController extends Controller
 {
@@ -18,7 +19,7 @@ class ReservationController extends Controller
      */
     public function index()
     {
-        $reservations = Reservation::paginate(10);
+        $reservations = Reservation::orderByDesc('id')->where('user_id', Auth::id())->paginate(10);
 
         return response()->json([
             'success' => true,
@@ -67,6 +68,7 @@ class ReservationController extends Controller
 
         $reservation = new Reservation();
         $reservation->name = $data['name'];
+        $reservation->user_id = Auth::id();
         $reservation->surname = $data['surname'];
         $reservation->date = $data['date'];
         $reservation->timeFrom = $data['timeFrom'];
@@ -86,11 +88,10 @@ class ReservationController extends Controller
      * @param  \App\Models\Reservation  $reservation
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Reservation $reservation)
     {
-        $reservation = Reservation::where('id', $id)->first();
 
-        if ($id && $reservation) {
+        if (Auth::id() === $reservation->user_id && $reservation) {
             return response()->json([
                 'success' => true,
                 'results' => $reservation,
@@ -154,7 +155,7 @@ class ReservationController extends Controller
         $reservation->notes = $request->notes;
         $result = $reservation->save();
 
-        if ($result) {
+        if ($result && Auth::id() === $reservation->user_id) {
             return response()->json([
                 'success' => true,
                 'results' => 'Reservation has been changed'

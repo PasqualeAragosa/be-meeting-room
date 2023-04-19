@@ -16,9 +16,10 @@ class ReservationSeeder extends Seeder
      */
     public function run(Faker $faker)
     {
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 5; $i++) {
             $reservation = new Reservation();
             $reservation->name = $faker->name();
+            $reservation->user_id = 2;
             $reservation->surname = $faker->lastName();
             $reservation->date = $faker->date('d-m-Y');
             $reservation->timeFrom = $faker->time('H:i');

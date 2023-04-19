@@ -20,22 +20,23 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/reservations', [ReservationController::class, 'index']);
-Route::post('/reservation', [ReservationController::class, 'store']);
-Route::get('/reservation/{reservation:id}', [ReservationController::class, 'show']);
-Route::delete('/reservation/delete/{reservation:id}', [ReservationController::class, 'destroy']);
-Route::put('/reservation/update', [ReservationController::class, 'update']);
-Route::get('/reservations/search/{string}', [ReservationController::class, 'search']);
-
 Route::group([
-
     'middleware' => 'api',
-    'prefix' => 'auth'
-
 ], function ($router) {
-
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
+});
+
+// Rotte protette dal middleware JWT
+Route::middleware(['jwt'])->group(function () {
+    Route::get('/reservations', [ReservationController::class, 'index']);
+    Route::post('/reservation', [ReservationController::class, 'store']);
+    Route::get('/reservation/{reservation:id}', [ReservationController::class, 'show']);
+    Route::delete('/reservation/delete/{reservation:id}', [ReservationController::class, 'destroy']);
+    Route::put('/reservation/update', [ReservationController::class, 'update']);
+    Route::get('/reservations/search/{string}', [ReservationController::class, 'search']);
+
+    // Sposta le rotte che richiedono autenticazione all'interno di questo gruppo
     Route::get('/profile', [AuthController::class, 'profile']);
     Route::post('/logout', [AuthController::class, 'logout']);
 });
