@@ -83,4 +83,9 @@ class AuthController extends Controller
             'message' => 'User logged out'
         ]);
     }
+
+    public function refresh()
+    {
+        return $this->createNewToken(auth()->refresh());
+    }
 }

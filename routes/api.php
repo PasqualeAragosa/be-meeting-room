@@ -35,8 +35,7 @@ Route::middleware(['jwt'])->group(function () {
     Route::delete('/reservation/delete/{reservation:id}', [ReservationController::class, 'destroy']);
     Route::put('/reservation/update', [ReservationController::class, 'update']);
     Route::get('/reservations/search/{string}', [ReservationController::class, 'search']);
-
-    // Sposta le rotte che richiedono autenticazione all'interno di questo gruppo
     Route::get('/profile', [AuthController::class, 'profile']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/refresh', [AuthController::class, 'refresh']);
 });

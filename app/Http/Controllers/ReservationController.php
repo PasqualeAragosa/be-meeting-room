@@ -77,8 +77,8 @@ class ReservationController extends Controller
         $validator = Validator::make(
             $data,
             [
-                'name' => 'required',
-                'surname' => 'required',
+                'user.name' => 'required',
+                'user.surname' => 'required',
                 'date' => 'required|date|date_format:d-m-Y',
                 'timeFrom' => 'required',
                 'timeTo' => 'required|after:timeFrom',
@@ -90,13 +90,13 @@ class ReservationController extends Controller
             return response()->json([
                 'success' => false,
                 'errors' => $validator->errors(),
-            ]);
+            ], 400);
         }
 
         $reservation = new Reservation();
-        $reservation->name = $data['name'];
+        $reservation->name = $data['user']['name'];
         $reservation->user_id = Auth::id();
-        $reservation->surname = $data['surname'];
+        $reservation->surname = $data['user']['surname'];
         $reservation->date = $data['date'];
         $reservation->timeFrom = $data['timeFrom'];
         $reservation->timeTo = $data['timeTo'];
@@ -179,8 +179,8 @@ class ReservationController extends Controller
         $validator = Validator::make(
             $data,
             [
-                'name' => 'required',
-                'surname' => 'required',
+                'user.name' => 'required',
+                'user.surname' => 'required',
                 'date' => 'required|date|date_format:d-m-Y',
                 'timeFrom' => 'required',
                 'timeTo' => 'required|after:timeFrom',
@@ -192,19 +192,35 @@ class ReservationController extends Controller
             return response()->json([
                 'success' => false,
                 'errors' => $validator->errors(),
-            ]);
+            ], 400);
         }
 
+        // Cerco la prenotazione da aggiornare
         $reservation = Reservation::find($request->id);
-        $reservation->name = $request->name;
-        $reservation->surname = $request->surname;
-        $reservation->date = $request->date;
-        $reservation->timeFrom = $request->timeFrom;
-        $reservation->timeTo = $request->timeTo;
-        $reservation->note = $request->note;
+
+        if (!$reservation) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Reservation not founded',
+            ], 404);
+        }
+
+        if (Auth::id() !== $reservation->user_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Non sei autorizzato ad aggiornare questa prenotazione',
+            ], 403);
+        }
+
+        $reservation->name = $data['user']['name'];
+        $reservation->surname = $data['user']['surname'];
+        $reservation->date = $data['date'];
+        $reservation->timeFrom = $data['timeFrom'];
+        $reservation->timeTo = $data['timeTo'];
+        $reservation->note = $data['note'];
         $result = $reservation->save();
 
-        if ($result && Auth::id() === $reservation->user_id) {
+        if ($result) {
             return response()->json([
                 'success' => true,
                 'results' => 'Reservation has been changed',
@@ -212,8 +228,8 @@ class ReservationController extends Controller
         } else {
             return response()->json([
                 'success' => false,
-                'results' => 'Reservation not founded'
-            ]);
+                'results' => 'Error Server'
+            ], 500);
         }
     }
 
