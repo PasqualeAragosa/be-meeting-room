@@ -259,15 +259,24 @@ class ReservationController extends Controller
 
     public function search(Request $request)
     {
-
-        $reservations = Reservation::where('user_id', Auth::id())->get();
+        $reservations = Reservation::where('user_id', Auth::id());
 
         if ($request->keywords) {
-            $reservations = Reservation::where("note", "like", "%" . $request->keywords . "%")->where('user_id', Auth::id())->get();
+            $reservations->where("note", "like", "%" . $request->keywords . "%");
         }
 
-        foreach ($reservations as $reservation) {
-            $results[] = [
+        $results = $reservations->get();
+
+        if ($results->isEmpty()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'No reservations match your search',
+                'results' => $results
+            ]);
+        }
+
+        $formattedResults = $results->map(function ($reservation) {
+            return [
                 'id' => $reservation->id,
                 'user_id' => $reservation->user_id,
                 'user' => [
@@ -279,15 +288,12 @@ class ReservationController extends Controller
                 'timeTo' => $reservation->timeTo,
                 'note' => $reservation->note
             ];
-        }
+        });
 
-
-
-        if ($results) {
-            return response()->json([
-                'success' => true,
-                'results' => $results
-            ]);
-        }
+        return response()->json([
+            'success' => true,
+            'total_results' => $results->count(),
+            'results' => $formattedResults
+        ]);
     }
 }
