@@ -171,9 +171,9 @@ class ReservationController extends Controller
      * @param  \App\Models\Reservation  $reservation
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
-
+        $request->request->add(['id' => $id]);
         $data = $request->all();
 
         $validator = Validator::make(
@@ -224,6 +224,7 @@ class ReservationController extends Controller
             return response()->json([
                 'success' => true,
                 'results' => 'Reservation has been changed',
+                'id_changed' => $data['id']
             ]);
         } else {
             return response()->json([
@@ -256,10 +257,14 @@ class ReservationController extends Controller
         }
     }
 
-    public function search($string)
+    public function search(Request $request)
     {
 
-        $reservations = Reservation::where("note", "like", "%" . $string . "%")->where('user_id', Auth::id())->get();
+        $reservations = Reservation::where('user_id', Auth::id())->get();
+
+        if ($request->keywords) {
+            $reservations = Reservation::where("note", "like", "%" . $request->keywords . "%")->where('user_id', Auth::id())->get();
+        }
 
         foreach ($reservations as $reservation) {
             $results[] = [
@@ -275,6 +280,8 @@ class ReservationController extends Controller
                 'note' => $reservation->note
             ];
         }
+
+
 
         if ($results) {
             return response()->json([
