@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Group;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -18,9 +20,9 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
+            'name' => 'required|min:4',
             'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|confirmed|min:6',
+            'password' => 'required|string|confirmed|min:8|max:12',
         ]);
 
         if ($validator->fails()) {
@@ -35,7 +37,15 @@ class AuthController extends Controller
             ['password' => bcrypt($request->password)]
         ));
 
+
+        $group = new Group();
+        $group->user_id = DB::table('users')->orderBy('id', 'desc')->pluck('id')->first();
+        $group->team = DB::table('groups')->orderBy('id', 'desc')->pluck('team')->first();
+        $group->team++;
+        $group->save();
+
         return response()->json([
+            'success' => true,
             'message' => 'User successfully registreted',
             'user' => $user
         ]);
@@ -45,7 +55,7 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
-            'password' => 'required|string|min:6',
+            'password' => 'required|string|min:8|max:12',
         ]);
 
         if ($validator->fails()) {

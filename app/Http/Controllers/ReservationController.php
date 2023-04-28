@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreReservationRequest;
 use App\Http\Requests\UpdateReservationRequest;
+use App\Models\Group;
 use Illuminate\Http\Request;
 use App\Models\Reservation;
 use Illuminate\Support\Facades\Validator;
@@ -19,7 +20,9 @@ class ReservationController extends Controller
      */
     public function index()
     {
-        $reservations = Reservation::orderByDesc('id')->where('user_id', Auth::id())->paginate(10);
+        $team = Group::where('user_id', Auth::id())->pluck('team')->first();
+
+        $reservations = Reservation::orderByDesc('id')->where('team_id', $team)->paginate(10);
 
         foreach ($reservations as $reservation) {
             $results[] = [
@@ -52,6 +55,11 @@ class ReservationController extends Controller
             'success' => true,
             'results' => $reservations
         ]);
+
+        return response()->json([
+            'success' => true,
+            'results' => $reservations
+        ]);
     }
 
     /**
@@ -74,6 +82,8 @@ class ReservationController extends Controller
     {
         $data = $request->all();
 
+        $team = Group::where('user_id', Auth::id())->pluck('team')->first();
+
         $validator = Validator::make(
             $data,
             [
@@ -95,7 +105,7 @@ class ReservationController extends Controller
 
         $reservation = new Reservation();
         $reservation->name = $data['user']['name'];
-        $reservation->user_id = Auth::id();
+        $reservation->team_id = $team;
         $reservation->surname = $data['user']['surname'];
         $reservation->date = $data['date'];
         $reservation->timeFrom = $data['timeFrom'];
@@ -107,7 +117,7 @@ class ReservationController extends Controller
             "success" => true,
             'results' => [
                 'id' => $reservation->id,
-                'user_id' => $reservation->user_id,
+                'team_id' => $reservation->team_id,
                 'user' => [
                     'name' => $reservation->name,
                     'surname' => $reservation->surname,
@@ -128,13 +138,14 @@ class ReservationController extends Controller
      */
     public function show(Reservation $reservation)
     {
+        $team = Group::where('user_id', Auth::id())->pluck('team')->first();
 
-        if (Auth::id() === $reservation->user_id && $reservation) {
+        if ($team === $reservation->team_id && $reservation) {
             return response()->json([
                 'success' => true,
                 'results' => [
                     'id' => $reservation->id,
-                    'user_id' => $reservation->user_id,
+                    'team_id' => $reservation->team_id,
                     'user' => [
                         'name' => $reservation->name,
                         'surname' => $reservation->surname,
@@ -205,7 +216,9 @@ class ReservationController extends Controller
             ], 404);
         }
 
-        if (Auth::id() !== $reservation->user_id) {
+        $team = Group::where('user_id', Auth::id())->pluck('team')->first();
+
+        if ($team !== $reservation->team_id) {
             return response()->json([
                 'success' => false,
                 'message' => 'Non sei autorizzato ad aggiornare questa prenotazione',
@@ -244,29 +257,37 @@ class ReservationController extends Controller
     {
         $reservation = Reservation::find($id);
 
-        if ($id && $reservation) {
-            return response()->json([
-                'success' => $reservation->delete(),
-                'message' => "Reservation " . $id . " has been deleted",
-            ]);
-        } else {
+        if (!$reservation) {
             return response()->json([
                 'success' => false,
                 'message' => "Reservation id: " . $id . " not found",
-            ]);
+            ], 404);
         }
+
+        $success = $reservation->delete();
+
+        return response()->json([
+            'success' => $success,
+            'message' => "Reservation " . $id . " has been " . ($success ? "deleted" : "not deleted"),
+        ]);
     }
 
     public function search(Request $request)
     {
-        $reservations = Reservation::where('user_id', Auth::id());
+        $team = Group::where('user_id', Auth::id())->pluck('team')->first();
 
+        // Salvo solo i risultati che appartengono all'utente loggato
+        $reservations = Reservation::where('team_id', $team);
+
+        // Se presente un valore all'interno l'input di ricerca filtro i risultati
         if ($request->keywords) {
             $reservations->where("note", "like", "%" . $request->keywords . "%");
         }
 
+        // Salvo i risultati come array
         $results = $reservations->get();
 
+        // Se l'array è vuoto
         if ($results->isEmpty()) {
             return response()->json([
                 'success' => true,
@@ -275,10 +296,11 @@ class ReservationController extends Controller
             ]);
         }
 
+        // Formatto i risultati
         $formattedResults = $results->map(function ($reservation) {
             return [
                 'id' => $reservation->id,
-                'user_id' => $reservation->user_id,
+                'team_id' => $reservation->team_id,
                 'user' => [
                     'name' => $reservation->name,
                     'surname' => $reservation->surname
