@@ -19,11 +19,14 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|min:4',
-            'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|confirmed|min:8|max:12',
-        ]);
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'name' => 'required|min:4',
+                'email' => 'required|string|email|unique:users',
+                'password' => 'required|string|confirmed|min:8|max:12',
+            ]
+        );
 
         if ($validator->fails()) {
             return response()->json([
@@ -44,11 +47,11 @@ class AuthController extends Controller
         $group->team++;
         $group->save();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'User successfully registreted',
-            'user' => $user
-        ]);
+        if (!$token = auth()->attempt($validator->validated())) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        return $this->createNewToken($token);
     }
 
     public function login(Request $request)

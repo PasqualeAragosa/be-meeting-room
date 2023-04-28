@@ -16,7 +16,7 @@ class ReservationSeeder extends Seeder
      */
     public function run(Faker $faker)
     {
-        for ($i = 0; $i < 6; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             $reservation = new Reservation();
             $reservation->name = $faker->name();
             $reservation->team_id = 1;
