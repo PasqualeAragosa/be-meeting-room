@@ -137,29 +137,37 @@ class ReservationController extends Controller
     {
         $team = Group::where('user_id', Auth::id())->pluck('team')->first();
 
-        if ($team === $reservation->team_id && $reservation) {
-            return response()->json([
-                'success' => true,
-                'results' => [
-                    'id' => $reservation->id,
-                    'team_id' => $reservation->team_id,
-                    'user' => [
-                        'name' => $reservation->name,
-                        'surname' => $reservation->surname,
-                    ],
-                    'date' => $reservation->date,
-                    'timeFrom' => $reservation->timeFrom,
-                    'timeTo' => $reservation->timeTo,
-                    'note' => $reservation->note,
-                ]
-            ]);
-        } else {
+        if (!$reservation) {
             return response()->json([
                 'success' => false,
                 'results' => 'Reservation not found'
             ], 404);
         }
+
+        if ($team !== $reservation->team_id) {
+            return response()->json([
+                'success' => false,
+                'results' => 'Forbidden'
+            ], 403);
+        }
+
+        return response()->json([
+            'success' => true,
+            'results' => [
+                'id' => $reservation->id,
+                'team_id' => $reservation->team_id,
+                'user' => [
+                    'name' => $reservation->name,
+                    'surname' => $reservation->surname,
+                ],
+                'date' => $reservation->date,
+                'timeFrom' => $reservation->timeFrom,
+                'timeTo' => $reservation->timeTo,
+                'note' => $reservation->note,
+            ]
+        ]);
     }
+
 
     /**
      * Show the form for editing the specified resource.
