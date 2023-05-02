@@ -24,6 +24,8 @@ class ReservationController extends Controller
 
         $reservations = Reservation::orderByDesc('id')->where('team_id', $team)->paginate(10);
 
+        $results = [];
+
         foreach ($reservations as $reservation) {
             $results[] = [
                 'id' => $reservation->id,
@@ -50,11 +52,6 @@ class ReservationController extends Controller
             'from' => $reservations->firstItem(),
             'to' => $reservations->lastItem()
         ];
-
-        return response()->json([
-            'success' => true,
-            'results' => $reservations
-        ]);
 
         return response()->json([
             'success' => true,
@@ -255,6 +252,7 @@ class ReservationController extends Controller
      */
     public function destroy($id)
     {
+        // Aggiungi alla reservation l'autenticazione, ovvero il $team
         $reservation = Reservation::find($id);
 
         if (!$reservation) {
@@ -267,7 +265,7 @@ class ReservationController extends Controller
         $success = $reservation->delete();
 
         return response()->json([
-            'success' => $success,
+            'success' => $success ? true : false,
             'message' => "Reservation " . $id . " has been " . ($success ? "deleted" : "not deleted"),
         ]);
     }

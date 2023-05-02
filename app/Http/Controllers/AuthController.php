@@ -24,7 +24,10 @@ class AuthController extends Controller
             [
                 'name' => 'required|min:4',
                 'email' => 'required|string|email|unique:users',
-                'password' => 'required|string|confirmed|min:8|max:12',
+                'password' => 'required|string|confirmed|min:8|max:12|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/',
+            ],
+            [
+                'password.regex' => 'La password deve contenere almeno una lettera maiuscola, minuscola, un numero e un carattere speciale tra (@$!%*?&)'
             ]
         );
 
@@ -40,7 +43,7 @@ class AuthController extends Controller
             ['password' => bcrypt($request->password)]
         ));
 
-
+        // Assegna un nuovo record della colonna 'team'
         $group = new Group();
         $group->user_id = DB::table('users')->orderBy('id', 'desc')->pluck('id')->first();
         $group->team = DB::table('groups')->orderBy('id', 'desc')->pluck('team')->first();
@@ -58,7 +61,7 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
-            'password' => 'required|string|min:8|max:12',
+            'password' => 'required|string|min:8|max:12|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/',
         ]);
 
         if ($validator->fails()) {
