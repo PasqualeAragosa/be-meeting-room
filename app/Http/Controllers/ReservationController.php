@@ -88,30 +88,11 @@ class ReservationController extends Controller
      * @param  \App\Http\Requests\StoreReservationRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreReservationRequest $request)
     {
         $data = $request->all();
 
         $team = Group::where('user_id', Auth::id())->pluck('team')->first();
-
-        $validator = Validator::make(
-            $data,
-            [
-                'user.name' => 'required',
-                'user.surname' => 'required',
-                'date' => 'required|date|date_format:d-m-Y',
-                'timeFrom' => 'required',
-                'timeTo' => 'required|after:timeFrom',
-                'note' => 'required',
-            ]
-        );
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors(),
-            ], 400);
-        }
 
         $reservation = new Reservation();
         $reservation->name = $data['user']['name'];
@@ -193,29 +174,11 @@ class ReservationController extends Controller
      * @param  \App\Models\Reservation  $reservation
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateReservationRequest $request, $id)
     {
         $request->request->add(['id' => $id]);
+
         $data = $request->all();
-
-        $validator = Validator::make(
-            $data,
-            [
-                'user.name' => 'required',
-                'user.surname' => 'required',
-                'date' => 'required|date|date_format:d-m-Y',
-                'timeFrom' => 'required',
-                'timeTo' => 'required|after:timeFrom',
-                'note' => 'required',
-            ]
-        );
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors(),
-            ], 400);
-        }
 
         // Cerco la prenotazione da aggiornare
         $reservation = Reservation::find($request->id);
