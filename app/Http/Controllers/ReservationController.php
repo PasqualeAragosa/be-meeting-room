@@ -137,13 +137,6 @@ class ReservationController extends Controller
     {
         $team = Group::where('user_id', Auth::id())->pluck('team')->first();
 
-        if (!$reservation) {
-            return response()->json([
-                'success' => false,
-                'results' => 'Reservation not found'
-            ], 404);
-        }
-
         if ($team !== $reservation->team_id) {
             return response()->json([
                 'success' => false,
@@ -260,8 +253,9 @@ class ReservationController extends Controller
      */
     public function destroy($id)
     {
-        // Aggiungi alla reservation l'autenticazione, ovvero il $team
-        $reservation = Reservation::find($id);
+        $team = Group::where('user_id', Auth::id())->pluck('team')->first();
+
+        $reservation = Reservation::where('team_id', $team)->find($id);
 
         if (!$reservation) {
             return response()->json([
