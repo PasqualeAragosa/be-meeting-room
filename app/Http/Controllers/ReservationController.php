@@ -13,23 +13,35 @@ use Illuminate\Support\Facades\Auth;
 
 class ReservationController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function index(Request $request)
     {
         $team = Group::where('user_id', Auth::id())->pluck('team')->first();
 
-        $reservations = Reservation::orderByDesc('id')->where('team_id', $team)->paginate(10);
+        // Salvo solo i risultati che appartengono all'utente loggato
+        $reservations = Reservation::where('team_id', $team);
 
-        $results = [];
+        // Se presente un valore all'interno l'input di ricerca filtro i risultati
+        if ($request->keywords) {
+            $reservations->where("note", "like", "%" . $request->keywords . "%");
+        }
 
-        foreach ($reservations as $reservation) {
-            $results[] = [
+        // Salvo i risultati come array
+        $results = $reservations->paginate(10);
+
+        // Se l'array è vuoto
+        if ($results->isEmpty()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'No reservations match your search',
+                'results' => $results
+            ]);
+        }
+
+        // Formatto i risultati
+        $formattedResults = $results->map(function ($reservation) {
+            return [
                 'id' => $reservation->id,
-                'user_id' => $reservation->user_id,
+                'team_id' => $reservation->team_id,
                 'user' => [
                     'name' => $reservation->name,
                     'surname' => $reservation->surname
@@ -37,25 +49,26 @@ class ReservationController extends Controller
                 'date' => $reservation->date,
                 'timeFrom' => $reservation->timeFrom,
                 'timeTo' => $reservation->timeTo,
-                'note' => $reservation->note,
+                'note' => $reservation->note
             ];
-        }
+        });
 
-        $reservations = [
-            'current_page' => $reservations->currentPage(),
-            'data' => $results,
-            'last_page' => $reservations->lastPage(),
-            'per_page' => $reservations->perPage(),
-            'total' => $reservations->total(),
-            'next_page_url' => $reservations->nextPageUrl(),
-            'prev_page_url' => $reservations->previousPageUrl(),
-            'from' => $reservations->firstItem(),
-            'to' => $reservations->lastItem()
+        $data = [
+            'current_page' => $results->currentPage(),
+            'data' => $formattedResults,
+            'last_page' => $results->lastPage(),
+            'per_page' => $results->perPage(),
+            'total' => $results->total(),
+            'next_page_url' => $results->nextPageUrl(),
+            'prev_page_url' => $results->previousPageUrl(),
+            'from' => $results->firstItem(),
+            'to' => $results->lastItem()
         ];
 
         return response()->json([
             'success' => true,
-            'results' => $reservations
+            'total_results' => $results->count(),
+            'results' => $data
         ]);
     }
 
@@ -269,53 +282,6 @@ class ReservationController extends Controller
         return response()->json([
             'success' => $success ? true : false,
             'message' => "Reservation " . $id . " has been " . ($success ? "deleted" : "not deleted"),
-        ]);
-    }
-
-    public function search(Request $request)
-    {
-        $team = Group::where('user_id', Auth::id())->pluck('team')->first();
-
-        // Salvo solo i risultati che appartengono all'utente loggato
-        $reservations = Reservation::where('team_id', $team);
-
-        // Se presente un valore all'interno l'input di ricerca filtro i risultati
-        if ($request->keywords) {
-            $reservations->where("note", "like", "%" . $request->keywords . "%");
-        }
-
-        // Salvo i risultati come array
-        $results = $reservations->get();
-
-        // Se l'array è vuoto
-        if ($results->isEmpty()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'No reservations match your search',
-                'results' => $results
-            ]);
-        }
-
-        // Formatto i risultati
-        $formattedResults = $results->map(function ($reservation) {
-            return [
-                'id' => $reservation->id,
-                'team_id' => $reservation->team_id,
-                'user' => [
-                    'name' => $reservation->name,
-                    'surname' => $reservation->surname
-                ],
-                'date' => $reservation->date,
-                'timeFrom' => $reservation->timeFrom,
-                'timeTo' => $reservation->timeTo,
-                'note' => $reservation->note
-            ];
-        });
-
-        return response()->json([
-            'success' => true,
-            'total_results' => $results->count(),
-            'results' => $formattedResults
         ]);
     }
 }

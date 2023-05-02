@@ -34,7 +34,6 @@ Route::middleware(['jwt'])->group(function () {
     Route::get('/reservation/{reservation:id}', [ReservationController::class, 'show']);
     Route::delete('/reservation/delete/{reservation:id}', [ReservationController::class, 'destroy']);
     Route::put('/reservation/update/{reservation:id}', [ReservationController::class, 'update']);
-    Route::get('/reservations/search', [ReservationController::class, 'search']);
     Route::get('/profile', [AuthController::class, 'profile']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/refresh', [AuthController::class, 'refresh']);
