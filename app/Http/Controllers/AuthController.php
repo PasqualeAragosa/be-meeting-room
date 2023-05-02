@@ -72,7 +72,12 @@ class AuthController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        return $this->createNewToken($token);
+        $result = $this->createNewToken($token);
+
+        return response()->json([
+            'success' => $result->original['success'],
+            'access_token' => $result->original['access_token']
+        ]);
     }
 
     public function createNewToken($token)
