@@ -7,7 +7,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
-use Illuminate\Support\Facades\Validator;
+use Lcobucci\JWT\Exception;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -44,7 +45,7 @@ class AuthController extends Controller
     {
         $validatedData = $request->validated();
 
-        if (!$token = auth()->attempt($validatedData->validated())) {
+        if (!$token = auth()->attempt($validatedData)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -74,11 +75,19 @@ class AuthController extends Controller
 
     public function logout()
     {
-        auth()->logout();
-        return response()->json([
-            'success' => true,
-            'message' => 'User logged out'
-        ]);
+        try {
+            JWTAuth::invalidate(JWTAuth::getToken());
+            return response()->json([
+                'success' => true,
+                'message' => 'User logged out'
+            ]);
+        } catch (Exception $e) {
+            // Se si verifica un errore durante l'invalidazione del token
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to logout, please try again.'
+            ], 500);
+        }
     }
 
     public function refresh()
