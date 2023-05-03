@@ -7,8 +7,6 @@ use App\Http\Requests\UpdateReservationRequest;
 use App\Models\Group;
 use Illuminate\Http\Request;
 use App\Models\Reservation;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class ReservationController extends Controller
